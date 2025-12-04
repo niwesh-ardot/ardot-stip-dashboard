@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ARDOT STIP Dashboard 2025–2028</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP HEADER -->
+  <header class="header">
+    <div class="title-block">
+      <h1>ARDOT – STIP Program Overview</h1>
+      <p>Interactive view of 2025–2028 projects by district, FFY, work type, and funding program.</p>
+    </div>
+    <div class="toolbar">
+      <button class="toolbar-btn" type="button" id="resetFiltersBtn">
+        <span class="icon">↻</span>
+        Reset filters
+      </button>
+      <button class="toolbar-btn primary" type="button"
+              onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">
+        <span class="icon">📋</span>
+        View project table
+      </button>
+    </div>
+  </header>
+
+  <!-- HORIZONTAL KPI ROW -->
+  <section class="card kpi-section">
+    <div class="card-header">
+      <h2>Program Snapshot</h2>
+      <small id="activeFilterLabel">All projects (no filters)</small>
+    </div>
+    <div class="summary-grid" id="summaryGrid">
+      <!-- Filled by script.js -->
+    </div>
+  </section>
+
+  <!-- FILTERS + CHARTS -->
+  <section class="layout-grid">
+    <!-- FILTERS CARD -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Filters</h2>
+        <small>Refine view by district, FFY, work type, and county.</small>
+      </div>
+      <div class="filters">
+        <div class="filter-group">
+          <label for="districtFilter">District</label>
+          <select id="districtFilter"></select>
+        </div>
+        <div class="filter-group">
+          <label for="ffyFilter">FFY</label>
+          <select id="ffyFilter"></select>
+        </div>
+        <div class="filter-group">
+          <label for="workTypeFilter">Type of Work</label>
+          <select id="workTypeFilter"></select>
+        </div>
+        <div class="filter-group">
+          <label for="countyFilter">County</label>
+          <select id="countyFilter"></select>
+        </div>
+      </div>
+      <p class="filter-note">
+        All charts, KPIs, and the table respond instantly to your filter choices.
+      </p>
+    </div>
+
+    <!-- CHARTS CARD -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Funding and Work Mix</h2>
+        <small>High-level trends for the filtered projects.</small>
+      </div>
+
+      <div class="charts-grid">
+        <div>
+          <!-- Projects by Type of Work -->
+          <div class="chart-container">
+            <canvas id="projectsByWorkTypeChart"></canvas>
+          </div>
+        </div>
+        <div>
+          <!-- Total Cost by FFY -->
+          <div class="chart-container">
+            <canvas id="costByYearLineChart"></canvas>
+          </div>
+          <!-- Top Funding Programs -->
+          <div class="chart-container small">
+            <canvas id="fundingProgramsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLE SECTION -->
+  <section class="table-wrapper">
+    <div class="card">
+      <div class="card-header">
+        <h2>Project List</h2>
+        <small>Costs in thousands of dollars; lengths in miles.</small>
+      </div>
+      <div class="table-controls">
+        <div class="filter-group" style="flex: 1;">
+          <label for="searchInput">Search (Job number, Route, Termini)</label>
+          <input type="search" id="searchInput" placeholder="Type to search..." />
+        </div>
+        <div class="table-actions">
+          <button class="toolbar-btn" type="button" id="downloadCsvBtn">
+            <span class="icon">⬇️</span>
+            Download filtered CSV
+          </button>
+          <small id="tableCountLabel">0 projects shown</small>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="project-table">
+          <thead>
+          <tr>
+            <th>Job #</th>
+            <th>Termini</th>
+            <th>District</th>
+            <th>County</th>
+            <th>Route</th>
+            <th>FFY</th>
+            <th>Type of Work</th>
+            <th>Length (mi)</th>
+            <th>Total Cost (K)</th>
+          </tr>
+          </thead>
+          <tbody id="projectTableBody">
+          <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
