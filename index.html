@@ -2,149 +2,234 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ARDOT STIP Dashboard 2025–2028</title>
+  <title>ARDOT Transparency Dashboard 2025–2028</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- PapaParse for CSV parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-<div class="page">
 
-  <!-- TOP HEADER -->
-  <header class="header">
-    <div class="title-block">
-      <h1>ARDOT – STIP Program Overview</h1>
-      <p>Interactive view of 2025–2028 projects by district, FFY, work type, and funding program.</p>
+<div class="app-container">
+  
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>ARDOT</h2>
+      <p>Transparency Portal</p>
     </div>
-    <div class="toolbar">
-      <button class="toolbar-btn" type="button" id="resetFiltersBtn">
-        <span class="icon">↻</span>
-        Reset filters
+    <nav class="nav-menu">
+      <button class="nav-btn active" data-view="stip">
+        <span class="icon">🚧</span> STIP
       </button>
-      <button class="toolbar-btn primary" type="button"
-              onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">
-        <span class="icon">📋</span>
-        View project table
+      <button class="nav-btn" data-view="funding">
+        <span class="icon">💰</span> Funding Programs
       </button>
+      <button class="nav-btn" data-view="revenue">
+        <span class="icon">🏛️</span> State Revenue
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <small>Data: 2025–2028 STIP</small>
     </div>
-  </header>
+  </aside>
 
-  <!-- HORIZONTAL KPI ROW -->
-  <section class="card kpi-section">
-    <div class="card-header">
-      <h2>Program Snapshot</h2>
-      <small id="activeFilterLabel">All projects (no filters)</small>
-    </div>
-    <div class="summary-grid" id="summaryGrid">
-      <!-- Filled by script.js -->
-    </div>
-  </section>
+  <main class="main-content">
 
-  <!-- FILTERS + CHARTS -->
-  <section class="layout-grid">
-    <!-- FILTERS CARD -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Filters</h2>
-        <small>Refine view by district, FFY, work type, and county.</small>
-      </div>
-      <div class="filters">
-        <div class="filter-group">
-          <label for="districtFilter">District</label>
-          <select id="districtFilter"></select>
+    <div id="view-stip" class="view-section active">
+      <header class="header">
+        <div class="title-block">
+          <h1>STIP Explorer</h1>
+          <p>Explore planned transportation projects, costs, and timelines.</p>
         </div>
-        <div class="filter-group">
-          <label for="ffyFilter">FFY</label>
-          <select id="ffyFilter"></select>
+        <div class="toolbar">
+          <button class="toolbar-btn" type="button" id="resetFiltersBtn">↻ Reset filters</button>
         </div>
-        <div class="filter-group">
-          <label for="workTypeFilter">Type of Work</label>
-          <select id="workTypeFilter"></select>
-        </div>
-        <div class="filter-group">
-          <label for="countyFilter">County</label>
-          <select id="countyFilter"></select>
-        </div>
-      </div>
-      <p class="filter-note">
-        All charts, KPIs, and the table respond instantly to your filter choices.
-      </p>
-    </div>
+      </header>
 
-    <!-- CHARTS CARD -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Funding and Work Mix</h2>
-        <small>High-level trends for the filtered projects.</small>
-      </div>
+      <section class="card kpi-section">
+        <div class="summary-grid" id="stipSummaryGrid"></div>
+      </section>
 
-      <div class="charts-grid">
-        <div>
-          <!-- Projects by Type of Work -->
-          <div class="chart-container">
-            <canvas id="projectsByWorkTypeChart"></canvas>
+      <section class="layout-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2>Filters</h2>
+            <small>Refine by location and type</small>
+          </div>
+          <div class="filters">
+            <div class="filter-group">
+              <label>District</label>
+              <select id="districtFilter"></select>
+            </div>
+            <div class="filter-group">
+              <label>FFY</label>
+              <select id="ffyFilter"></select>
+            </div>
+            <div class="filter-group">
+              <label>Type of Work</label>
+              <select id="workTypeFilter"></select>
+            </div>
+            <div class="filter-group">
+              <label>County</label>
+              <select id="countyFilter"></select>
+            </div>
+            <div class="filter-group">
+              <label>State Job #</label>
+              <input type="search" id="jobFilter" placeholder="e.g., 12305" />
+            </div>
           </div>
         </div>
-        <div>
-          <!-- Total Cost by FFY -->
-          <div class="chart-container">
-            <canvas id="costByYearLineChart"></canvas>
-          </div>
-          <!-- Top Funding Programs -->
-          <div class="chart-container small">
-            <canvas id="fundingProgramsChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- TABLE SECTION -->
-  <section class="table-wrapper">
-    <div class="card">
-      <div class="card-header">
-        <h2>Project List</h2>
-        <small>Costs in thousands of dollars; lengths in miles.</small>
-      </div>
-      <div class="table-controls">
-        <div class="filter-group" style="flex: 1;">
-          <label for="searchInput">Search (Job number, Route, Termini)</label>
-          <input type="search" id="searchInput" placeholder="Type to search..." />
+        <div class="card">
+          <div class="card-header">
+            <h2>Project Mix</h2>
+          </div>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <canvas id="projectsByWorkTypeChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="costByYearLineChart"></canvas>
+            </div>
+          </div>
         </div>
-        <div class="table-actions">
-          <button class="toolbar-btn" type="button" id="downloadCsvBtn">
-            <span class="icon">⬇️</span>
-            Download filtered CSV
-          </button>
-          <small id="tableCountLabel">0 projects shown</small>
-        </div>
-      </div>
+      </section>
 
-      <div class="table-scroll">
-        <table class="project-table">
-          <thead>
-          <tr>
-            <th>Job #</th>
-            <th>Termini</th>
-            <th>District</th>
-            <th>County</th>
-            <th>Route</th>
-            <th>FFY</th>
-            <th>Type of Work</th>
-            <th>Length (mi)</th>
-            <th>Total Cost (K)</th>
-          </tr>
-          </thead>
-          <tbody id="projectTableBody">
-          <!-- Rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
+      <section class="table-wrapper card">
+        <div class="card-header">
+          <h2>Project List</h2>
+          <div class="table-controls">
+            <input type="search" id="searchInput" placeholder="Search Route, Job #..." />
+            <button class="toolbar-btn" id="downloadCsvBtn">⬇️ CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="project-table">
+            <thead>
+              <tr>
+                <th>Job #</th>
+                <th>Termini</th>
+                <th>District</th>
+                <th>County</th>
+                <th>Route</th>
+                <th>FFY</th>
+                <th>Work Type</th>
+                <th>Length (mi)</th>
+                <th>Cost (M)</th>
+              </tr>
+            </thead>
+            <tbody id="projectTableBody"></tbody>
+          </table>
+        </div>
+      </section>
     </div>
-  </section>
+
+    <div id="view-funding" class="view-section">
+      <header class="header">
+        <div class="title-block">
+          <h1>Funding Analysis</h1>
+          <p>Comparison of Available vs. Scheduled funds by source (Federal, State, Local).</p>
+        </div>
+        <div class="toolbar">
+          <div class="filter-group">
+            <label>FFY</label>
+            <select id="fundingYearFilter"></select>
+          </div>
+        </div>
+      </header>
+
+      <section class="card kpi-section">
+        <div class="summary-grid" id="fundingSummaryGrid"></div>
+      </section>
+
+      <section class="layout-grid-single">
+        <div class="card">
+          <div class="card-header">
+            <h2>Available vs. Scheduled (2025–2028)</h2>
+            <small>Are we spending within our means?</small>
+          </div>
+          <div class="chart-container large">
+            <canvas id="fundingBalanceChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Funding Composition by Year</h2>
+          </div>
+          <div class="chart-container large">
+            <canvas id="fundingCompositionChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="layout-grid-single">
+        <div class="card">
+          <div class="card-header">
+            <h2>Federal Funds by Category</h2>
+            <small>Distribution of Federal programs (Available)</small>
+          </div>
+          <div class="chart-container large">
+            <canvas id="federalCategoryChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Non-Federal Funds by Category</h2>
+            <small>Distribution of Non-Federal programs (Available)</small>
+          </div>
+          <div class="chart-container large">
+            <canvas id="nonFederalCategoryChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="view-revenue" class="view-section">
+      <header class="header">
+        <div class="title-block">
+          <h1>State Revenue Analysis</h1>
+          <p>Where the money comes from: Motor Fuel, Taxes, and Acts.</p>
+        </div>
+        <div class="toolbar">
+          <div class="filter-group">
+            <label>FFY</label>
+            <select id="revenueYearFilter"></select>
+          </div>
+        </div>
+      </header>
+
+      <section class="card kpi-section">
+        <div class="summary-grid" id="revenueSummaryGrid"></div>
+      </section>
+
+      <section class="layout-grid-single">
+        <div class="card">
+          <div class="card-header">
+            <h2>Revenue Trends (2025–2028)</h2>
+            <small>Projected growth of state revenue sources.</small>
+          </div>
+          <div class="chart-container large">
+            <canvas id="revenueTrendChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h2>Revenue Mix (4-Year Avg)</h2>
+            <small>Which sources contribute the most?</small>
+          </div>
+          <div class="chart-container large">
+            <canvas id="revenuePieChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+  </main>
 </div>
 
 <script src="script.js"></script>
